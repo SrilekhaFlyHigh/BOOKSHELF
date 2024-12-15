@@ -12,15 +12,14 @@
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-  "start": "concurrently \"npm run server\" \"npm run client\"",
-  "build": "react-scripts build",
-  "test": "react-scripts test",
-  "eject": "react-scripts eject",
-  "clean": "rmdir /s /q build && rmdir /s /q node_modules\\.cache",
-  "client": "react-scripts start",
-  "server": "node ../backend/server.js"
-},
-
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "clean": "rmdir /s /q build && rmdir /s /q node_modules\\.cache",
+    "client": "react-scripts start",
+    "server": "node ../backend/server.js"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -42,6 +41,7 @@
   "devDependencies": {
     "concurrently": "^9.1.0",
     "css-loader": "^7.1.2",
+    "serve": "^14.2.4",
     "style-loader": "^4.0.0"
   }
 }
