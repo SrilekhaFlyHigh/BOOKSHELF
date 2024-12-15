@@ -1,0 +1,16 @@
+.homepage {
+    background-image: url('../styles/homepagewallpaper.jpg');     
+    height: 90vh;
+  }
+  
+h2 {
+    color: white;
+    text-align: center;
+    font-weight: 1000;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}   
+
+p {
+    color: white;
+    
+}
