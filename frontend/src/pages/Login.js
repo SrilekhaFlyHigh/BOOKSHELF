@@ -1,27 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import 'styles/login.css';
-
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    // Static check for successful login
-    if (email && password) {
-      setMessage('Login successful');
-    } else {
-      setMessage('Please fill in both fields');
+  const handleLogin = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        alert("Login successful!");
+        console.log("Token:", data.token);
+      } else {
+        alert(data.error || "Login failed!");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
     }
   };
+  
 
   return (
-    <div className="">
-      <h3>Please login here</h3>
+    <div>
+      <h2 className="logintext">Please login here</h2>
       <form onSubmit={handleLogin}>
-        <div className='loginform'>
-          <label>Email:</label>
+        <div className="formfields">
+          <label className="email">Email:</label>
           <input
             type="email"
             value={email}
@@ -30,7 +46,7 @@ const Login = () => {
           />
         </div>
         <div>
-          <label>Password:</label>
+          <label className="password">Password:</label>
           <input
             type="password"
             value={password}
@@ -40,10 +56,9 @@ const Login = () => {
         </div>
         <button className="loginbtn" type="submit">Login</button>
       </form>
-      {message && <p>{message}</p>}
+      {error && <p>{error}</p>}
     </div>
   );
 };
 
 export default Login;
-

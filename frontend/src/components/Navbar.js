@@ -24,11 +24,11 @@ const styles = {
     display: 'flex',
     listStyleType: 'none',
     margin: 0,
-    padding: 0,
+    backgroundColor: 'sandybrown',
   },
   navItem: {
     color: '#fff',
-    margin: '0 1rem',
+    //margin: '0 1rem',
     textDecoration: 'none',
     fontSize: '1.2rem',
   },

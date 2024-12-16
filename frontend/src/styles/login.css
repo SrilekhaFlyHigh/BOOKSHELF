@@ -3,5 +3,28 @@
 }
 
 .loginbtn{
-  margin : 20px 67px;
+  left: 346px;
+  display: inline-block;
+  position: relative;
+  bottom: -9px;
+}
+
+
+.logintext{
+  color: black;
+  display: inline-block;
+}
+
+.email{
+  margin: 0px 10px;;
+}
+
+.password{
+  margin: 0px 70px;
+}
+
+.formfields{
+  display: inline-block;
+    position: relative;
+    bottom: 10px;
 }

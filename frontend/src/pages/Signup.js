@@ -1,95 +1,102 @@
-import React, { useState } from 'react';
+
+import React, { useState } from "react";
 import 'styles/signup.css';
 
 const Signup = () => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [message, setMessage] = useState("");
 
-  const [message, setMessage] = useState('');
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulating user creation
-    const { firstName, lastName, email, password, confirmPassword } = formData;
-    if (firstName && lastName && email && password && confirmPassword) {
-      if (password === confirmPassword) {
-        setMessage('User created successfully');
+
+    // Form validation
+    if (password !== confirmPassword) {
+      setMessage("Passwords do not match");
+      return;
+    }
+
+    const userData = { firstName, lastName, email, password, confirmPassword };
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const result = await response.json();
+      
+      if (response.status === 201) {
+        setMessage("User registered successfully");
       } else {
-        setMessage('Passwords do not match');
+        setMessage(result.error || "Something went wrong");
       }
-    } else {
-      setMessage('Please fill in all fields');
+    } catch (error) {
+      setMessage("Error: " + error.message);
     }
   };
 
   return (
-    <div>
-      <h3>Please fill the details here..</h3>
+    <div className="signupform">
+      <h2 className="signuptext">Please fill the form </h2>
       <form onSubmit={handleSubmit}>
-        <div className='signupform'>
-          <label>First Name:</label>
+        <div>
+          <label className="fn">First Name</label>
           <input
             type="text"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleInputChange}
+            placeholder="First Name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
             required
           />
         </div>
-        <div className='signupform'> 
-          <label>Last Name:</label>
+        <div className="">
+          <label className="fn">Last Name</label>
           <input
             type="text"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleInputChange}
+            placeholder="Last Name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
             required
           />
         </div>
-        <div className='signupform'>
-          <label>Email:</label>
+        <div>
+          <label className="email">Email</label>
           <input
             type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
-        <div className='signupform'>
-          <label>Password:</label>
+        <div>
+          <label className="password">Password</label>
           <input
             type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
-        <div className='signupform'>
-          <label>Confirm Password:</label>
+        <div>
+          <label className="labeltext">Confirm Password</label>
           <input
             type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
         </div>
-        <button className="signupbtn" type="submit">Sign Up</button>
+        <button className="signupbtn" type="submit">Signup</button>
       </form>
       {message && <p>{message}</p>}
     </div>
@@ -97,3 +104,5 @@ const Signup = () => {
 };
 
 export default Signup;
+
+

@@ -23,13 +23,15 @@ nav ul li a, nav ul li button {
 }
 
 button {
-  background-color: #f44336;
+  background-color: sandybrown;
   border: none;
   cursor: pointer;
+  height: 30px;
+  width: auto;
 }
 
 button:hover {
-  background-color: #d32f2f;
+  background-color: azure;
 }
 
 footer {

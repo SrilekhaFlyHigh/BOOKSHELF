@@ -2,112 +2,85 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const path = require("path");
-const fetch = require("node-fetch");  // Assuming you're using node-fetch for the API request
-const Book = require("./models/Book");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("./models/User"); // User model
 
 const app = express();
 const PORT = 5000;
+const JWT_SECRET = "your_secret_key_here";
 
-// Middleware
+
 app.use(cors());
 app.use(bodyParser.json());
 
-// Serve static files from the React app (build folder)
-app.use(express.static(path.join(__dirname, 'build')));
 
-// MongoDB Atlas connection
 mongoose
-  .connect("mongodb+srv://bookshelfadmin:adminbookshelf@bookshelfdb.pqi6h.mongodb.net/?retryWrites=true&w=majority&appName=bookshelfdb", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(
+    "mongodb+srv://bookshelfadmin:adminbookshelf@bookshelfdb.pqi6h.mongodb.net/?retryWrites=true&w=majority&appName=bookshelfdb",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error("MongoDB Connection Error:", err));
 
-// Routes
 
-// Search Books using a third-party API
-app.get("/search", async (req, res) => {
-  const query = req.query.q;
+
+app.post("/api/auth/signup", async (req, res) => {
+  const { firstName, lastName, email, password } = req.body;
+
   try {
-    const response = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=${query}`
-    );
-    const data = await response.json();
-    const books = data.items.map((item) => ({
-      title: item.volumeInfo.title,
-      author: item.volumeInfo.authors?.join(", "),
-      thumbnail: item.volumeInfo.imageLinks?.thumbnail,
-      rating: item.volumeInfo.averageRating || 0,
-    }));
-    res.status(200).json(books);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({ firstName, lastName, email, password: hashedPassword });
+
+    await user.save();
+    res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch books" });
+    console.error("Error during signup:", error); 
+    res.status(500).json({ error: "Failed to register user" });
   }
 });
 
-// Add a book to the bookshelf
-app.post("/books", async (req, res) => {
-  const { title, author, thumbnail, rating, review } = req.body;
-  try {
-    const book = new Book({ title, author, thumbnail, rating, review });
-    await book.save();
-    res.status(201).json(book);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to add the book" });
-  }
-});
 
-// Get all books in the bookshelf
-app.get("/books", async (req, res) => {
-  try {
-    const books = await Book.find();
-    res.status(200).json(books);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch books" });
-  }
-});
 
-// Update book review/rating
-app.put("/books/:id", async (req, res) => {
-  const { id } = req.params;
-  const { rating, review } = req.body;
+app.post("/api/auth/login", async (req, res) => {
+  const { email, password } = req.body;
+
   try {
-    const book = await Book.findByIdAndUpdate(
-      id,
-      { rating, review },
-      { new: true }
-    );
-    if (!book) {
-      return res.status(404).json({ message: "Book not found" });
+    
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ error: "Invalid credentials" });
     }
-    res.status(200).json(book);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to update the book" });
-  }
-});
 
-// Delete a book
-app.delete("/books/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const book = await Book.findByIdAndDelete(id);
-    if (!book) {
-      return res.status(404).json({ message: "Book not found" });
+    const isPasswordValid = await user.validatePassword(password);
+    if (!isPasswordValid) {
+        return res.status(401).json({ error: "Invalid credentials" });
     }
-    res.status(200).json({ message: "Book deleted successfully" });
+
+  
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({ token });
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete the book" });
+    console.error("Error during login:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-// Catch-all handler to serve index.html for any route (for React app)
+
+app.use(express.static(path.join(__dirname, "../frontend/build")));
+
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
 });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
