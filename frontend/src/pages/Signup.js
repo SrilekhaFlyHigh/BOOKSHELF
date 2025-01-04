@@ -8,20 +8,21 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState("");  // For showing success/error messages
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Form validation
+  
+    // Validate if passwords match
     if (password !== confirmPassword) {
       setMessage("Passwords do not match");
       return;
     }
-
+  
     const userData = { firstName, lastName, email, password, confirmPassword };
-
+  
     try {
+      // Send signup request to the backend
       const response = await fetch("http://localhost:5000/api/auth/signup", {
         method: "POST",
         headers: {
@@ -29,22 +30,31 @@ const Signup = () => {
         },
         body: JSON.stringify(userData),
       });
-
+  
+      // Parse the response
       const result = await response.json();
-      
+  
+      // Check if the response status is 201 (Created)
       if (response.status === 201) {
-        setMessage("User registered successfully");
+        setMessage(result.message);  // Set success message from backend
+        // Clear form fields after successful signup
+        setFirstName("");
+        setLastName("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
       } else {
-        setMessage(result.error || "Something went wrong");
+        setMessage(result.error || "Something went wrong");  // Error handling
       }
     } catch (error) {
+      // Handle network or server error
       setMessage("Error: " + error.message);
     }
   };
-
+  
   return (
-    <div className="signupform">
-      <h2 className="signuptext">Please fill the form </h2>
+    <div className="signup-container signup-form">
+      <h2 className="signuptext">Please fill the form to register..</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label className="fn">First Name</label>
@@ -56,8 +66,8 @@ const Signup = () => {
             required
           />
         </div>
-        <div className="">
-          <label className="fn">Last Name</label>
+        <div className="fn">
+          <label>Last Name</label>
           <input
             type="text"
             placeholder="Last Name"
@@ -98,11 +108,11 @@ const Signup = () => {
         </div>
         <button className="signupbtn" type="submit">Signup</button>
       </form>
-      {message && <p>{message}</p>}
+
+      {/* Displaying success or error message */}
+      {message && <p className="message">{message}</p>}
     </div>
   );
 };
 
 export default Signup;
-
-

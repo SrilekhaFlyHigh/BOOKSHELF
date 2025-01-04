@@ -1,64 +1,83 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import 'styles/login.css';
-const Login = () => {
+import "styles/login.css";
+
+const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
+    setSuccessMessage("");
+
     try {
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-  
+
       const data = await response.json();
-  
-      if (response.ok) {
-        alert("Login successful!");
-        console.log("Token:", data.token);
+
+      if (response.status === 200) {
+        localStorage.setItem("token", data.token);
+        onLoginSuccess(); // Trigger onLoginSuccess to update the login state       
+        setSuccessMessage("Login successful! Redirecting...");
+       
+        setTimeout(() =>  navigate('/my-bookshelf'), 1500);
       } else {
-        alert(data.error || "Login failed!");
+        setErrorMessage(data.error || "Login failed. Please try again.");
       }
     } catch (error) {
       console.error("Error during login:", error);
+      setErrorMessage("Unable to connect to the server. Please try again later.");
     }
   };
-  
 
   return (
-    <div>
-      <h2 className="logintext">Please login here</h2>
-      <form onSubmit={handleLogin}>
-        <div className="formfields">
-          <label className="email">Email:</label>
+    <div className="login-container">
+      <form className="login-form" onSubmit={handleLogin}>
+        <h2 className="login-title">Please enter registered details..</h2>
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
+        {successMessage && <p className="success-message">{successMessage}</p>}
+
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
           <input
             type="email"
+            id="email"
+            placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
-        <div>
-          <label className="password">Password:</label>
+
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
           <input
             type="password"
+            id="password"
+            placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
-        <button className="loginbtn" type="submit">Login</button>
+
+        <button type="submit">Login</button>
+
+        <p className="link">
+           Don't have an account? <a href="/signup">Sign Up</a>
+         </p>
       </form>
-      {error && <p>{error}</p>}
     </div>
   );
 };
 
 export default Login;
+

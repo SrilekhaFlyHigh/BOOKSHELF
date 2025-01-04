@@ -1,126 +1,86 @@
-// // // import React, { useState, useEffect } from 'react';
-// // // import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-// // // import axios from 'axios';
-// // // import './App.css';
 
-// // // // Importing Components
-// // // import Navbar from './components/Navbar';
-// // // import Footer from './components/Footer';
-// // // import MyBookshelf from './pages/MyBookshelf';
-// // // import Login from './pages/Login';
-// // // import Signup from './pages/Signup';
-// // // import Dashboard from './pages/Dashboard';
-
-// // // const App = () => {
-// // //   const [isAuthenticated, setIsAuthenticated] = useState(false);
-// // //   const [loading, setLoading] = useState(true);
-
-// // //   // Check if user is authenticated
-// // //   useEffect(() => {
-// // //     const token = localStorage.getItem('token');
-// // //     if (token) {
-// // //       setIsAuthenticated(true);
-// // //     }
-// // //     setLoading(false);
-// // //   }, []);
-
-// // //   // If the app is still loading, show a loading screen
-// // //   if (loading) {
-// // //     return <div>Loading...</div>;
-// // //   }
-
-// // //   return (
-// // //     <Router>
-// // //       <div className="App">
-// // //         <Navbar />
-// // //         <div className="container">
-// // //           <Routes>
-// // //             {/* Public routes (accessible for everyone) */}
-// // //             <Route path="/" element={<Dashboard />} />
-// // //             <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/my-bookshelf" />} />
-// // //             <Route path="/login" element={!isAuthenticated ? <Login setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/my-bookshelf" />} />
-            
-// // //             {/* Private route (accessible only if authenticated) */}
-// // //             <Route 
-// // //               path="/my-bookshelf" 
-// // //               element={isAuthenticated ? <MyBookshelf /> : <Navigate to="/login" />} 
-// // //             />
-// // //           </Routes>
-// // //         </div>
-// // //         <Footer />
-// // //       </div>
-// // //     </Router>
-// // //   );
-// // // };
-
-// // // export default App;
-
-
-
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import HomePage from './pages/Home';
 import MyBookshelf from './pages/MyBookshelf';
 import SearchBooks from './pages/SearchBooks';
-import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import axios from 'axios';
 
-const App = () => {
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+    navigate('/my-bookshelf');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove the token from localStorage
+    setIsLoggedIn(false); // Update the login state to false
+    navigate('/');
+  };
+
+  const [bookshelf, setBookshelf] = useState([]);
+
+  // Function to add a book to the bookshelf
+  const addBookToBookshelf = async (book) => {
+    const bookData = {
+      title: book.volumeInfo.title,
+      authors: book.volumeInfo.authors || ['Unknown Author'],
+      thumbnail: book.volumeInfo.imageLinks?.thumbnail || 'default-image.jpg',
+      description: book.volumeInfo.description || 'No description available.',
+    };
+
+    try {
+      // Save book to the backend
+      const response = await axios.post('http://localhost:5000/api/bookshelf', bookData);
+      // Update state with the newly added book
+      setBookshelf((prevBookshelf) => [...prevBookshelf, response.data]);
+      console.log('Book successfully added:', response.data);
+    } catch (error) {
+      console.error('Error adding book to bookshelf:', error);
+    }
+  };
+
   return (
-    <Router>
-      <div className="app">
-        {/* Navbar */}
-        <Navbar />
-
-        {/* Main Content */}
-        <div>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/" element={<HomePage />} />
-            <Route path="/mybookshelf" element={<MyBookshelf />} />
-            <Route path="/searchbooks" element={<SearchBooks />} />
-          </Routes>
-        </div>
-
-        {/* Footer */}
-        <Footer />
+    <>
+      <div>
+      <Navbar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+      <Routes>
+        <Route
+          path="/"
+          element={isLoggedIn ? <Home /> : <Home />}
+        />
+        <Route
+          path="/my-bookshelf"
+          element={isLoggedIn ? <MyBookshelf /> : <Login onLoginSuccess={handleLoginSuccess} />}
+        />
+        <Route
+          path="/search-books"
+          element={isLoggedIn ? <SearchBooks /> : <Login onLoginSuccess={handleLoginSuccess} />}
+        />
+        <Route
+          path="/login"
+          element={isLoggedIn ? <Home /> : <Login onLoginSuccess={handleLoginSuccess} />}
+        />
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+      <Footer />
       </div>
-    </Router>
+    </>
   );
-};
+}
 
-export default App; //Already in GITHUB
-
-// import React from "react";
-// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-// import Navbar from "./components/Navbar";
-// import Footer from "./components/Footer";
-// import Dashboard from "./pages/Dashboard";
-// import MyBookshelf from "./pages/MyBookshelf";
-// import Login from "./pages/Login";
-// import Signup from "./pages/Signup";
-// import BookDetails from "./pages/BookDetails";
-
-// function App() {
-//   return (
-//     <Router>
-//       <div>
-//         <Navbar />
-//         <Routes>
-//           <Route path="/" element={<Dashboard />} />
-//           <Route path="/mybookshelf" element={<MyBookshelf />} />
-//           <Route path="/login" element={<Login />} />
-//           <Route path="/signup" element={<Signup />} />
-//           <Route path="/book/:id" element={<BookDetails />} />
-//         </Routes>
-//         <Footer />
-//       </div>
-//     </Router>
-//   );
-// }
-
-// export default App;
-
+export default App;

@@ -1,15 +1,18 @@
+
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Navbar = () => {
+const Navbar = ({ isLoggedIn, onLogout }) => {
   return (
     <nav style={styles.navbar}>
       <ul style={styles.navList}>
         <li><Link to="/" style={styles.navItem}>Home</Link></li>
-        <li><Link to="/login" style={styles.navItem}>Login</Link></li>
-        <li><Link to="/signup" style={styles.navItem}>Signup</Link></li>
-        <li><Link to="/mybookshelf" style={styles.navItem}>My Bookshelf</Link></li>
-        <li><Link to="/searchbooks" style={styles.navItem}>Search Books</Link></li>
+        {!isLoggedIn && <li><Link to="/login" style={styles.navItem}>Login</Link></li>}
+        {!isLoggedIn && <li><Link to="/signup" style={styles.navItem}>Signup</Link></li>}
+        {isLoggedIn && <li><Link to="/my-bookshelf" style={styles.navItem}>My Bookshelf</Link></li>}
+        {isLoggedIn && <li><Link to="/search-books" style={styles.navItem}>Search Books</Link></li>}
+        {isLoggedIn && <li><button onClick={onLogout} style={styles.navButton}>Logout</button></li>}
       </ul>
     </nav>
   );
@@ -28,11 +31,61 @@ const styles = {
   },
   navItem: {
     color: '#fff',
-    //margin: '0 1rem',
     textDecoration: 'none',
     fontSize: '1.2rem',
   },
+
+  navButton: {
+    position: 'relative',
+    top: '-10px',
+    fontSize: '1.2rem',
+  }
 };
 
 export default Navbar;
 
+
+// import React from 'react';
+// import { Link } from 'react-router-dom';
+
+// const Navbar = ({ isLoggedIn, onLogout }) => {
+//   return (
+//     <nav style={styles.navbar}>
+//       <ul style={styles.navList}>
+//         {/* Home link is always visible */}
+//         <li><Link to="/" style={styles.navItem}>Home</Link></li>
+        
+//         {/* If the user is not logged in, show Login and Signup links */}
+//         {!isLoggedIn && <li><Link to="/login" style={styles.navItem}>Login</Link></li>}
+//         {!isLoggedIn && <li><Link to="/signup" style={styles.navItem}>Signup</Link></li>}
+        
+//         {/* If the user is logged in, show MyBookshelf and SearchBooks links */}
+//         {isLoggedIn && <li><Link to="/my-bookshelf" style={styles.navItem}>My Bookshelf</Link></li>}
+//         {isLoggedIn && <li><Link to="/search-books" style={styles.navItem}>Search Books</Link></li>}
+        
+//         {/* If logged in, show logout button */}
+//         {isLoggedIn && <li><Link to={onLogout} style={styles.navItem}>Logout</Link></li>}
+//       </ul>
+//     </nav>
+//   );
+// };
+
+// const styles = {
+//   navbar: {
+//     backgroundColor: 'sandybrown',
+//     padding: '1rem',
+//   },
+//   navList: {
+//     display: 'flex',
+//     listStyleType: 'none',
+//     margin: 0,
+//     backgroundColor: 'sandybrown',
+//   },
+//   navItem: {
+//     color: '#fff',
+//     textDecoration: 'none',
+//     fontSize: '1.2rem',
+//   },
+// };
+
+// export default Navbar;
