@@ -1,0 +1,6 @@
+[build]
+  command = "npm run build"  # Command to build your app. If no build step, you can remove this line.
+  publish = "/"  # Set this to the folder where your build output is located. Use "/" for direct deployment.
+
+[build.environment]
+  NODE_ENV = "production"  # Ensures production mode for Node.js app

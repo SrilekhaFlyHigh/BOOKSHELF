@@ -17,7 +17,8 @@ const app = express();
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 const GOOGLE_BOOKS_API_KEY = process.env.GOOGLE_BOOKS_API_KEY;
-//const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = process.env.MONGO_URI;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
@@ -190,5 +191,6 @@ app.get("/api/books/user/:userId", authenticateToken, async (req, res) => {
   }
 });
 
-const PORT = 5000;
-app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
