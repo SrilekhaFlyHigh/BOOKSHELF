@@ -4,37 +4,25 @@ const { protectRoute } = require('../controllers/authController');
 
 const router = express.Router();
 
-
-router.post('/', protectRoute, async (req, res) => {
-  const { book } = req.body;
-
+router.get('/all', async (req, res) => {
   try {
-    
-    const newBook = new Book({
-      title: book.volumeInfo.title,
-      author: book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'Unknown',
-      thumbnail: book.volumeInfo.imageLinks ? book.volumeInfo.imageLinks.thumbnail : '',
-      averageRating: book.volumeInfo.averageRating || 'No Rating',
-      user: req.user._id,
-    });
-
-    await newBook.save();
-    res.status(201).json(newBook); 
+    const books = await Book.find();
+    res.json(books);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ error: 'Failed to fetch books' });
   }
 });
 
 
-router.get('/', protectRoute, async (req, res) => {
+router.post('/add', async (req, res) => {
+  const { title, author, rating, review, userId } = req.body;
+  
+  const newBook = new Book({ title, author, rating, review, userId });
   try {
-    
-    const books = await Book.find({ user: req.user._id });
-    res.json(books); 
+    await newBook.save();
+    res.status(201).json(newBook);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ error: 'Failed to add book' });
   }
 });
 

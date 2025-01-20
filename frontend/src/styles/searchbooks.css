@@ -1,3 +1,127 @@
 .searchbox{
-    margin: 0 0 50px;
+    display: inline-block;
+    width: 50%;
+    height: 30px;  
+   
 }
+.searchbutton{
+    padding: 10px 15px;
+    margin-left: 10px;
+    margin-top: 12px;
+    height: 35px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+}
+ .addtobookshelf-btn{
+    margin: 10px 0 0;
+    padding: 10px 15px;
+    background-color: sandybrown;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+ }
+
+ .author-name{
+    color: black;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 14px;
+ }
+
+.remove-button{
+    margin: 0.8rem 0;
+}
+
+/* Grid container for books */
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 books per row */
+    gap: 20px; /* Space between books */
+    margin-top: 20px;
+}
+
+/* Styling individual book boxes */
+.book-box {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Adjusts spacing for dynamic content */
+    height: auto; /* Ensures dynamic height */
+    min-height: 250px; /* Optional: Sets a minimum height for consistency */
+    width: 50%;
+}
+
+/* Book thumbnail styling */
+.book-box img {
+    height: 150px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    object-fit: cover;
+    max-width: 100%;
+}
+
+/* Title and author styling */
+.book-box h3 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.book-box .author-name {
+    color: black;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* Add button styling */
+.addtobookshelf-btn {
+    margin-top: 10px;
+    padding: 10px 15px;
+    background-color: sandybrown;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    align-self: center; /* Centers the button */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .books-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 books per row for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .books-grid {
+        grid-template-columns: 1fr; /* 1 book per row for extra small screens */
+    }
+}
+  .books-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .book-box {
+    width: 200px;
+    border: 1px dotted #ccc;
+    padding: 15px;
+    text-align: center;
+  }
+  
+  .success-message {
+    color: green;
+    background-color: antiquewhite;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  

@@ -1,96 +1,114 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import 'styles/searchbooks.css';
-import 'styles/mybookshelf.css';
 
-const SearchBooks = ({ addBookToBookshelf }) => {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
+const SearchBooks = ({ onAddBook }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [books, setBooks] = useState([]);
   const [error, setError] = useState(null);
-  const API_KEY = "AIzaSyDSQylmKgyAyg4ahgBu4-Rw50atRUONZ4M";
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(''); // Success message state
 
-  const searchBooks = async () => {
-    if (!query) return; // Avoid unnecessary API calls
+  const fetchBooks = async () => {
+    if (searchTerm.trim() === '') return; // Prevent empty searches
     try {
-      const response = await axios.get(
-        `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=10&key=${API_KEY}`
-      );
-      setResults(response.data.items || []);
+      setLoading(true);
       setError(null);
+
+      const response = await axios.get(
+        `https://www.googleapis.com/books/v1/volumes?q=${searchTerm}&key=AIzaSyDSQylmKgyAyg4ahgBu4-Rw50atRUONZ4M`
+      );
+
+      setBooks(response.data.items || []);
     } catch (err) {
-      console.error("Error searching books:", err);
+      console.error('Error fetching books:', err);
+
       if (err.response?.status === 429) {
-        setError("Too many requests. Please try again later.");
+        setError('You’ve reached the request limit. Please try again later.');
       } else {
-        setError("An error occurred while searching for books.");
+        setError('Unable to fetch books. Please check your connection.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    searchBooks();
+  const handleSearch = () => {
+    fetchBooks();
   };
 
+  const handleAddBook = (book) => {
+    onAddBook({
+      title: book.volumeInfo.title,
+      author: book.volumeInfo.authors?.join(', ') || 'Unknown',
+      thumbnail: book.volumeInfo.imageLinks?.thumbnail || null,
+      rating: 0, // Default rating, could be updated later
+      review: '', // Default empty review
+    });
+    
 
-  // const handleSearch = async () => {
-  //   if (query.trim()) {
-  //     try {
-  //       const response = await axios.get(
-  //         `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=10&key=${API_KEY}`
-  //       );
-  //       setResults(response.data.items || []);
-  //     } catch (err) {
-  //       setError('Error fetching books');
-  //       console.error(err);
-  //     }
-  //   }
-  // };
-
-  
-  console.log("addBookToBookshelf in SearchBooks:", addBookToBookshelf);
+    // Set and display success message
+    setSuccessMessage(
+            <>
+              <strong>{book.volumeInfo.title}</strong> has been added to your bookshelf! Please go to MyBookshelf and check.
+            </>
+          );
+    setTimeout(() => setSuccessMessage(''), 10000); // Auto-hide the success message after 10 seconds
+  };
 
   return (
-    <div className="book-search search-text">
-      <h3>Please type book name and search here...</h3>
-      <input className='search-input'
+    <div>
+      <h1 style={{ textAlign: 'center' }}>Welcome to Books World !!!</h1>
+      <p className='book-message'>
+        Please type any keyword or book name and start exploring books you love!!!
+      </p>
+      <input
+        className='searchbox'
         type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
         placeholder="Search for books"
+        
       />
-      
-      <button className='search-button' onClick={handleSearch}>Search</button>
-      
-      {error && <p>{error}</p>}
+      <button
+        className='searchbutton'
+        onClick={handleSearch}
+        
+      >
+        Search
+      </button>
 
-      <div className="search-results">
-        {results.length > 0 ? (
-          results.map((book) => (
-            <div key={book.id} className="book-card">
+      {/* Display success message */}
+      {successMessage && <p className='success-message'>{successMessage}</p>}
+
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      <div className="books-grid">
+        {books.map((book, index) => (
+          <div key={book.id || index} className='book-box'>
+            <h3>{book.volumeInfo.title}</h3>
+            <p className='author-name'>
+              Author: {book.volumeInfo.authors?.join(', ') || 'Unknown'}
+            </p>
+            {book.volumeInfo.imageLinks?.thumbnail && (
               <img
-                src={book.volumeInfo.imageLinks?.thumbnail || 'default-image.jpg'}
+                src={book.volumeInfo.imageLinks.thumbnail}
                 alt={book.volumeInfo.title}
               />
-              <h3>{book.volumeInfo.title}</h3>
-              <p>{book.volumeInfo.authors?.join(', ') || 'Unknown Author'}</p>
+            )}
+            <button
+              className='addtobookshelf-btn'
+              onClick={() => handleAddBook(book)}
               
-              <button onClick={() => addBookToBookshelf({
-                title: book.volumeInfo.title,
-                authors: book.volumeInfo.authors?.join(', ') || 'Unknown Author',
-                image: book.volumeInfo.imageLinks?.thumbnail || 'default-image.jpg',
-                id: book.id
-              })}>
-                Add to Bookshelf
-              </button>
-            </div>
-          ))
-        ) : (
-          <p>No results found.</p>
-        )}
+            >
+              Add to Bookshelf
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
-export default SearchBooks; 
+export default SearchBooks;

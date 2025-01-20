@@ -1,32 +1,45 @@
-// import React from 'react';
+// // src/components/BookCard.js
+import React, { useState } from 'react';
 
-// const BookCard = ({ book }) => {
-//   return (
-//     <div className="book-card">
-//       <img src={book.thumbnail} alt={book.title} />
-//       <h3>{book.title}</h3>
-//       <p>{book.author}</p>
-//       <p>{book.averageRating}</p>
-//     </div>
-//   );
-// };
+const BookCard = ({ book, onAddReview, onUpdateRating }) => {
+  const [review, setReview] = useState(book.review || '');
+  const [rating, setRating] = useState(book.rating || 0);
 
-// export default BookCard; GITHUB uploaded
+  const handleReviewChange = (e) => setReview(e.target.value);
+  const handleRatingChange = (e) => setRating(e.target.value);
 
-import React from 'react';
+  const handleReviewSubmit = () => onAddReview(review);
+  const handleRatingSubmit = () => onUpdateRating(rating);
 
-const BookCard = ({ book }) => {
   return (
     <div className="book-card">
-      <img
-        src={book.volumeInfo.imageLinks?.thumbnail || 'default-image.jpg'}
-        alt={book.volumeInfo.title}
-      />
-      <h3>{book.volumeInfo.title}</h3>
-      <p>{book.volumeInfo.authors?.join(', ') || 'Unknown Author'}</p>
+      <img src={book.thumbnail} alt={book.title} />
+      <h3>{book.title}</h3>
+      <p>{book.author}</p>
+      <p>Rating: {book.rating}</p>
+      <p>{book.averageRating}</p>
+
+      <div>
+        <textarea
+          value={review}
+          onChange={handleReviewChange}
+          placeholder="Add a review"
+        ></textarea>
+        <button onClick={handleReviewSubmit}>Save Review</button>
+      </div>
+
+      <div>
+        <input
+          type="number"
+          value={rating}
+          onChange={handleRatingChange}
+          min="1"
+          max="5"
+        />
+        <button onClick={handleRatingSubmit}>Update Rating</button>
+      </div>
     </div>
   );
 };
 
 export default BookCard;
-
