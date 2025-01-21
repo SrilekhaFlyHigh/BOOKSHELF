@@ -29,7 +29,7 @@ app.use("/api/books", bookRoutes);
 app.use("/api/auth", authRoutes);
 
 // Serve static files from the React frontend app
-app.use(express.static(path.join(__dirname, "../frontend/build")));
+app.use(express.static(path.join(__dirname, 'frontend', 'build')));
 
 // API routes (as they already exist)
 app.get("/api/books/search-books", async (req, res) => {
@@ -62,8 +62,8 @@ app.get("/api/books/search-books", async (req, res) => {
 });
 
 // For any other route, serve the React frontend app
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'build', 'index.html'));
 });
 
 // MongoDB connection

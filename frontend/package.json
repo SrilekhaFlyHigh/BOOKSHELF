@@ -19,7 +19,8 @@
     "eject": "react-scripts eject",
     "clean": "rmdir /s /q build && rmdir /s /q node_modules\\.cache",
     "client": "react-scripts start",
-    "server": "node ../backend/server.js"
+    "server": "node ../backend/server.js" 
+    
   },
   "eslintConfig": {
     "extends": [
