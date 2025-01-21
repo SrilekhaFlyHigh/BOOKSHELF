@@ -1,11 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const axios = require("axios");
+const path = require("path");
 
 const User = require("./models/User");
 const Book = require("./models/Book");
@@ -27,18 +28,57 @@ app.use(express.json());
 app.use("/api/books", bookRoutes);
 app.use("/api/auth", authRoutes);
 
-// Connect to MongoDB
+// Serve static files from the React frontend app
+app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+// API routes (as they already exist)
+app.get("/api/books/search-books", async (req, res) => {
+  const { query } = req.query;
+  if (!query) return res.status(400).json({ error: "Query parameter is required" });
+
+  try {
+    const response = await axios.get("https://www.googleapis.com/books/v1/volumes", {
+      params: {
+        q: query,
+        key: GOOGLE_BOOKS_API_KEY,
+      },
+    });
+
+    if (response.data.items) {
+      const books = response.data.items.map((item) => ({
+        title: item.volumeInfo.title,
+        author: item.volumeInfo.authors ? item.volumeInfo.authors.join(", ") : "Unknown",
+        thumbnail: item.volumeInfo.imageLinks?.thumbnail || "",
+        averageRating: item.volumeInfo.averageRating || "N/A",
+      }));
+      res.json(books);
+    } else {
+      res.status(404).json({ error: "No books found" });
+    }
+  } catch (error) {
+    console.error("Error fetching books:", error);
+    res.status(500).json({ error: "Failed to fetch books" });
+  }
+});
+
+// For any other route, serve the React frontend app
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
+});
+
+// MongoDB connection
 mongoose
-.connect(
-      "mongodb+srv://bookshelfadmin:adminbookshelf@bookshelfdb.pqi6h.mongodb.net/?retryWrites=true&w=majority&appName=bookshelfdb",
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
-    )
+  .connect(
+    "mongodb+srv://bookshelfadmin:adminbookshelf@bookshelfdb.pqi6h.mongodb.net/?retryWrites=true&w=majority&appName=bookshelfdb",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
+// Authentication middleware
 function authenticateToken(req, res, next) {
   const authHeader = req.header("Authorization");
   const token = authHeader && authHeader.split(" ")[1];
@@ -76,8 +116,7 @@ app.post("/api/auth/signup", async (req, res) => {
   }
 });
 
-// Login Route
-// Login Route
+// Login route
 app.post("/api/auth/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -100,38 +139,7 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-
-// Route: Search books using Google Books API
-app.get("/api/books/search-books", async (req, res) => {
-  const { query } = req.query;
-  if (!query) return res.status(400).json({ error: "Query parameter is required" });
-
-  try {
-    const response = await axios.get("https://www.googleapis.com/books/v1/volumes", {
-      params: {
-        q: query,
-        key: GOOGLE_BOOKS_API_KEY,
-      },
-    });
-
-    if (response.data.items) {
-      const books = response.data.items.map((item) => ({
-        title: item.volumeInfo.title,
-        author: item.volumeInfo.authors ? item.volumeInfo.authors.join(", ") : "Unknown",
-        thumbnail: item.volumeInfo.imageLinks?.thumbnail || "",
-        averageRating: item.volumeInfo.averageRating || "N/A",
-      }));
-      res.json(books);
-    } else {
-      res.status(404).json({ error: "No books found" });
-    }
-  } catch (error) {
-    console.error("Error fetching books:", error);
-    res.status(500).json({ error: "Failed to fetch books" });
-  }
-});
-
-// Route: Add a book to the bookshelf
+// Additional book routes
 app.post("/api/my-bookshelf/:userId", authenticateToken, async (req, res) => {
   const { userId } = req.params;
   if (userId !== req.user.userId) {
@@ -158,7 +166,6 @@ app.post("/api/my-bookshelf/:userId", authenticateToken, async (req, res) => {
   }
 });
 
-// Route: Update book rating or review
 app.put("/api/my-bookshelf/:bookId", authenticateToken, async (req, res) => {
   const { bookId } = req.params;
   const { rating, review } = req.body;
@@ -178,7 +185,6 @@ app.put("/api/my-bookshelf/:bookId", authenticateToken, async (req, res) => {
   }
 });
 
-// Route: Get user-specific books
 app.get("/api/books/user/:userId", authenticateToken, async (req, res) => {
   const { userId } = req.params;
 
@@ -191,6 +197,7 @@ app.get("/api/books/user/:userId", authenticateToken, async (req, res) => {
   }
 });
 
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
