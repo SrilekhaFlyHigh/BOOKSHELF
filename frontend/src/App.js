@@ -7,6 +7,7 @@ import Signup from './pages/Signup';
 import MyBookshelf from './pages/MyBookshelf';
 import SearchBooks from './pages/SearchBooks';
 import Footer from './components/Footer';
+import axios from 'axios';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -15,6 +16,35 @@ function App() {
   const [ratings, setRatings] = useState({}); // State to track ratings
   const [reviews, setReviews] = useState({}); // State to track reviews
   const navigate = useNavigate();
+//   const saveBookToDB = async (bookData) => {
+//   const token = localStorage.getItem('token');
+//   if (!token) {
+//     alert('You must be logged in!');
+//     return;
+//   }
+//   try {
+//     const response = await axios.post(
+//       'http://localhost:5000/api/books',
+//       bookData,
+//       {
+//         headers: {
+//           'Authorization': `Bearer ${token}`,
+//           'Content-Type': 'application/json',
+//         },
+//       }
+//     );
+//     console.log('Book saved successfully:', response.data);
+//     navigate('/my-bookshelf');
+//   } catch (error) {
+//     console.error('Error saving book:', error);
+//     if (error.response && error.response.status === 401) {
+//       alert('Token is invalid or expired. Please log in again.');
+//     } else {
+//       alert('An error occurred while saving the book.');
+//     }
+//   }
+// };
+  
 
   // Check if the user is logged in on mount
   useEffect(() => {
@@ -31,12 +61,14 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('token'); // Remove token from localStorage
+    localStorage.removeItem("userId");
     setIsLoggedIn(false); // Update login state
     navigate('/'); // Redirect to home
   };
 
   // Add book to MyBookshelf and trigger success message
   const addBookToBookshelf = (book) => {
+    //saveBookToDB(book)
     setMyBooks((prevBooks) => [...prevBooks, book]);
     setShowSuccessMessage(true);
     setTimeout(() => setShowSuccessMessage(false), 3000); // Auto-hide success message after 3 seconds
