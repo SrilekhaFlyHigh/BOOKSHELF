@@ -699,7 +699,7 @@ app.post("/api/books", authenticateToken, async (req, res) => {
     console.error("Error adding book:", error);
     res.status(500).json({ error: "Error adding book" });
   }
-});//for now
+});//for now// Added some
 
 //Delete a book from user's bookshelf
 app.delete('/api/books', async (req, res) => {

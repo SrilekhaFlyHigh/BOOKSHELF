@@ -10,7 +10,7 @@ import Footer from './components/Footer';
 import axios from 'axios';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);// Added some
   const [myBooks, setMyBooks] = useState([]); // State to manage books in MyBookshelf
   const [showSuccessMessage, setShowSuccessMessage] = useState(false); // State to manage success message
   const [ratings, setRatings] = useState({}); // State to track ratings

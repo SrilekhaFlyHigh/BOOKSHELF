@@ -118,7 +118,7 @@ const getUserDetails = async (req, res) => {
   }
 };
 
-module.exports = { signup, login, getUserDetails };
+module.exports = { signup, login, getUserDetails }; // Added some
 
 // // authController.js
 // const User = require("../models/User");

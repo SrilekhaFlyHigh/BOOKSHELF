@@ -252,4 +252,4 @@ const SearchBooks = ({ onAddBook }) => {
   );
 };
 
-export default SearchBooks;
+export default SearchBooks;// Added some

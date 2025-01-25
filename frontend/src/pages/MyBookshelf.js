@@ -468,7 +468,7 @@
 
 import React, { useState, useEffect } from 'react';
 import 'styles/mybookshelf.css'; // Add styles as needed
-import 'styles/searchbooks.css';
+import 'styles/searchbooks.css'; // Added some 
 
 const MyBookshelf = ({ books, onRemoveBook }) => {
   const [showRemoveMessage, setShowRemoveMessage] = useState(false);

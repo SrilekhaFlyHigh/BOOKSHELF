@@ -222,7 +222,7 @@
 const Book = require("../models/Book");
 const jwt = require("jsonwebtoken");
 const express = require('express');
-const JWT_SECRET='your-secret-key';
+const JWT_SECRET='your-secret-key';// Added some
 
 // Utility function to authenticate JWT
 const authenticateToken = (req, res, next) => {
