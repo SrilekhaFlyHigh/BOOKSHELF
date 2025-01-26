@@ -53,11 +53,12 @@ const Signup = () => {
   };
   
   return (
+    <div className="login-backgroundimage">
     <div className="signup-container signup-form">
       <h2 className="signuptext">Please fill the form to register..</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label className="fn">First Name</label>
+          <label className="signup-label">First Name</label>
           <input
             type="text"
             placeholder="First Name"
@@ -66,7 +67,7 @@ const Signup = () => {
             required
           />
         </div>
-        <div className="fn">
+        <div className="signup-label">
           <label>Last Name</label>
           <input
             type="text"
@@ -77,7 +78,7 @@ const Signup = () => {
           />
         </div>
         <div>
-          <label className="email">Email</label>
+          <label className="signup-label">Email</label>
           <input
             type="email"
             placeholder="Email"
@@ -87,7 +88,7 @@ const Signup = () => {
           />
         </div>
         <div>
-          <label className="password">Password</label>
+          <label className="signup-label">Password</label>
           <input
             type="password"
             placeholder="Password"
@@ -97,7 +98,7 @@ const Signup = () => {
           />
         </div>
         <div>
-          <label className="labeltext">Confirm Password</label>
+          <label className="signup-label">Confirm Password</label>
           <input
             type="password"
             placeholder="Confirm Password"
@@ -111,6 +112,7 @@ const Signup = () => {
 
       {/* Displaying success or error message */}
       {message && <p className="message">{message}</p>}
+    </div>
     </div>
   );
 };

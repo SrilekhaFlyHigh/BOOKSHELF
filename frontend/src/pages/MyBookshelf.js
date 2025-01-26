@@ -476,94 +476,105 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
   const [reviews, setReviews] = useState({}); // Track reviews for books
   const [ratings, setRatings] = useState({}); // Track ratings for books 
   const [myBooks, setMyBooks] = useState([]);
-  const [successMessage, setSuccessMessage] = useState('');  // State for success message
+  // const [successMessage, setSuccessMessage] = useState('');  // State for success message
+  const [isEditing, setIsEditing] = useState({}); // Track which book is being edited
+
   
 
   // useEffect(() => {
   //   console.log('Bookshelf updated:', books);
   // }, [books]);
 
-  // //to display the collection after reload 
-  // const showCollection = async () => {
-  //   try {
-  //     const userId = localStorage.getItem("userId") || ""
-  //     const response = await fetch(`http://localhost:5000/api/books/user/${userId}`, {
-  //       method: 'GET',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'authorization': localStorage.getItem('token')
-  //       }
-    
-  //     });
-  //     const data = await response?.json()
-  //     if (!response.ok) {
-  //       throw new Error('Failed to save review');
-  //     }
-  //     setMyBooks(data?.books)
-  //     console.log('Your collection!', data);
-  //   } catch (error) {
-  //     console.error('Error in displaying collection:', error);
-  //   }
-  // };
-  //  useEffect(() => {
-  //   showCollection()
-  //    }, []);for now
-
-  useEffect(() => {
+  //to display the collection after reload 
   const showCollection = async () => {
-    const token = localStorage.getItem("token");  // Retrieve the stored token
-
     try {
-      const userId = localStorage.getItem("userId") || "";
+      const userId = localStorage.getItem("userId") || ""
+      const token = localStorage.getItem("token");
       const response = await fetch(`http://localhost:5000/api/books/user/${userId}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
-          authorization: localStorage.getItem("token"),
-        },
-      });
-      const data = await response?.json();
-      console.log('Fetched data:', data); // Debugging: Check the fetched data
-      if (!response.ok) {
-        throw new Error("Failed to fetch books");
-      }
-      setMyBooks(data?.books);
-      console.log('Updated myBooks state:', data?.books); // Debugging: Verify state
-    } catch (error) {
-      console.error("Error in fetching collection:", error);
-    }
-  };
-  showCollection();
-}, []);
-
-
-
-  // Save review to the database
-  const saveReviewToDB = async (bookId, reviewText) => {
-    try {
-      const response = await fetch(`http://localhost:5000/books/${bookId}/review`, {
-        method: 'PUT',
-        headers: {
+          Authorization: `Bearer ${token}`, // Include token in header
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ review: reviewText }),
+    
       });
-
+      const data = await response?.json()
       if (!response.ok) {
         throw new Error('Failed to save review');
       }
-      console.log('Review saved successfully!');
+      setMyBooks(data?.books)
+      console.log('Your collection!', data);
+    } catch (error) {
+      console.error('Error in displaying collection:', error);
+    }
+  };
+   useEffect(() => {
+    showCollection()
+     }, []);//for now
+
+  // const showCollection = async () => {
+  //   try {
+  //     const token = localStorage.getItem("token"); // Retrieve token from localStorage
+  //     const userId = localStorage.getItem("userId"); // Retrieve userId from localStorage
+  
+  //     if (!token) {
+  //       throw new Error("No token found. Please log in again.");
+  //     }
+  
+  //     const response = await fetch(`http://localhost:5000/api/books/user/${userId}`, {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`, // Include token in Authorization header
+  //       },
+  //     });
+  
+  //     const data = await response.json();
+  
+  //     if (!response.ok) {
+  //       console.error("Fetched data: ", data);
+  //       throw new Error(data.message || "Failed to fetch books");
+  //     }
+  
+  //     console.log("Fetched data: ", data);
+  //     // Handle the fetched data (e.g., update state or UI)
+  //   } catch (error) {
+  //     console.error("Error in fetching collection:", error);
+  //   }
+  // };
+  
+
+  // Save review to the database
+  const saveReviewToDB = async (bookId, review) => {
+    try {
+      const response = await fetch(`http://localhost:5000/books/${bookId}/review`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ review }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to save review');
+      }
+  
+      const data = await response.json();
+      console.log(data);
     } catch (error) {
       console.error('Error saving review:', error);
     }
   };
+  
 
   // Save rating to the database
   const saveRatingToDB = async (bookId, rating) => {
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`http://localhost:5000/api/books/${bookId}/rating`, {
-        method: 'PUT',
+        method: 'POST',
         headers: {
+          Authorization: `Bearer ${token}`, // Include token in header
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ rating }),
@@ -581,8 +592,12 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
   // Remove review from the database
   const removeReviewFromDB = async (bookId) => {
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`http://localhost:5000/books/${bookId}/review`, {
-        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`, // Include token in header
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -594,7 +609,7 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
     }
   };
 
-  //Remove book from db and from collection
+  //Remove book from db and from collection working fine dont remove
   const handleRemoveBook = async (index) => {
     try {
       const userId = localStorage.getItem('userId') || "" ; // Retrieve the userId from storage or state
@@ -634,10 +649,11 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
     }
   };
   
-  
+  /**from here the reviews and ratings start */
 
   const handleRatingChange = (index, rating) => {
-    const bookId = books[index]?._id; // Assuming each book has a unique `_id`
+    const bookId = myBooks[index]?._id; // Assuming each book has a unique `_id`
+    console.log('Book ID:', bookId);
     setRatings((prev) => ({
       ...prev,
       [index]: rating,
@@ -646,7 +662,8 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
   };
 
   const handleReviewChange = (index, reviewText) => {
-    const bookId = books[index]?._id; // Assuming each book has a unique `_id`
+    const bookId = myBooks[index]?._id; // Assuming each book has a unique `_id`
+    console.log('Book ID:', bookId);
     setReviews((prev) => ({
       ...prev,
       [index]: reviewText,
@@ -664,9 +681,32 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
     if (bookId) removeReviewFromDB(bookId); // Remove from DB
   };
 
+  const handleEditToggle = (index) => {
+    setIsEditing((prev) => ({
+      ...prev,
+      [index]: !prev[index], // Toggle edit mode for the specific book
+    }));
+  };
+
+  const handleSaveChanges = (index) => {
+    const bookId = books[index]?._id; // Assuming each book has a unique `_id`
+    const updatedReview = reviews[index];
+    const updatedRating = ratings[index];
+
+    if (bookId) {
+      saveReviewToDB(bookId, updatedReview);
+      saveRatingToDB(bookId, updatedRating);
+    }
+
+    setIsEditing((prev) => ({
+      ...prev,
+      [index]: false, // Disable edit mode after saving
+    }));
+  };
+
   return (
-    <div className="my-bookshelf">
-      <h1>
+    <div className="my-bookshelf mybookshelf-image">
+      <h1 className='mycollections-text'>
         <center>My Collections</center>
       </h1>
       {showRemoveMessage && (
@@ -720,6 +760,15 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
               <button className="remove-button" onClick={() => handleRemoveBook(index)}>
                 Remove
               </button>
+              {isEditing[index] ? (
+                  <button className="save-button" onClick={() => handleSaveChanges(index)}>
+                            Save Changes
+                  </button>
+                  ) : (
+                  <button className="edit-button" onClick={() => handleEditToggle(index)}>
+                      Add / Edit Review
+                  </button>
+                  )}
             </li>
           ))}
         </ul>

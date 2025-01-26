@@ -573,19 +573,11 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ message: 'Unauthorized: Token is missing' });
   }
 
-  try {
-    // Verify the token
-    const decoded = jwt.verify(token, 'your-secret-key'); // Replace with your actual secret key
-    console.log('Decoded token:', decoded); // Debugging line to check decoded payload
-    
-    // Attach the decoded user info to the request object
-    req.user = decoded; // You can access the decoded user data here (e.g., req.user.userId)
-    
-    next(); // Proceed to the next middleware or route handler
-  } catch (error) {
-    console.error('Error while decoding token:', error);
-    return res.status(400).json({ message: 'Invalid or expired token.' });
-  }
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.status(401).json({ message: 'Invalid token' });
+    req.user = user;
+    next();
+  });
 };
 
 
@@ -675,31 +667,34 @@ app.post("/api/auth/login", async (req, res) => {
 
 // Add a book to a user's bookshelf
 app.post("/api/books", authenticateToken, async (req, res) => {
-  const { bookId, title, author, rating, review, thumbnail } = req.body;
-  const userId = req.user.userId;
+  const token = req.headers.authorization?.split(' ')[1]; // Get token from headers
 
-  if (!bookId || !title || !author) {
-    return res.status(400).json({ error: "Book ID, title, and author are required" });
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized, no token provided' });
   }
 
   try {
+    // Verify the token
+    const decoded = jwt.verify(token, 'your_jwt_secret'); // Replace with your secret key
+    const userId = decoded.userId;
+
+    // Create new book instance
     const newBook = new Book({
-      userId,
-      bookId,
-      title,
-      author,
-      rating,
-      review,
-      thumbnail,
+      title: req.body.title,
+      authors: req.body.authors,
+      thumbnail: req.body.thumbnail,
+      rating: req.body.rating,
+      userId: userId, // Attach userId to the book to link it to the current user
     });
 
+    // Save the book to the database
     const savedBook = await newBook.save();
-    res.status(200).json({ message: "Book added to your bookshelf", book: savedBook });
+    res.status(201).json(savedBook);
   } catch (error) {
-    console.error("Error adding book:", error);
-    res.status(500).json({ error: "Error adding book" });
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred while saving the book' });
   }
-});//for now// Added some
+});
 
 //Delete a book from user's bookshelf
 app.delete('/api/books', async (req, res) => {
@@ -724,8 +719,8 @@ app.delete('/api/books', async (req, res) => {
 
 
 
-// Update book details
-app.put("/api/books/:bookId", authenticateToken, async (req, res) => {
+// Save book rating
+app.put("/api/books/:bookId/rating", authenticateToken, async (req, res) => {
   const { bookId } = req.params;
   const { rating, review } = req.body;
 
@@ -745,20 +740,28 @@ app.put("/api/books/:bookId", authenticateToken, async (req, res) => {
 });
 
 // Save book review
-app.put('/api/books/:id/review', authenticateToken, async (req, res) => {
-  const { id } = req.params;
-  const { review } = req.body;
+app.post('api/books/:bookId/review', async (req, res) => {
+  const bookId = req.params.bookId;
+  const { reviewText, reviewerName, rating } = req.body;
 
   try {
-    const updatedBook = await Book.findByIdAndUpdate(
-      id,
-      { review },
-      { new: true }
-    );
-    if (!updatedBook) return res.status(404).json({ error: 'Book not found' });
-    res.json(updatedBook);
+    // Find the book by ID
+    const book = await Book.findById(bookId);
+
+    if (!book) {
+      return res.status(404).json({ message: 'Book not found' });
+    }
+
+    // Add the review to the book's reviews array
+    book.reviews.push({ reviewText, reviewerName, rating });
+
+    // Save the updated book document
+    await book.save();
+
+    res.status(200).json({ message: 'Review saved successfully', book });
   } catch (error) {
-    res.status(500).json({ error: 'Error saving review' });
+    console.error('Error saving review:', error);
+    res.status(500).json({ message: 'Failed to save review' });
   }
 });
 

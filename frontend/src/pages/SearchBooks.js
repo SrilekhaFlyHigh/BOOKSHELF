@@ -116,40 +116,186 @@
 
 
 
- import React, { useState } from 'react'; //with db code sooper working dont change
- import axios from 'axios';
- import { useNavigate } from 'react-router-dom';
- import 'styles/searchbooks.css';
+//  import React, { useState } from 'react'; //with db code sooper working dont change
+//  import axios from 'axios';
+//  import { useNavigate } from 'react-router-dom';
+//  import 'styles/searchbooks.css';
+// const saveBookToDB = async (bookData, navigate) => {
+//   const token = localStorage.getItem('token');
+//   if (!token) {
+//     alert('You must be logged in!');
+//     return;
+//   }
+//   try {
+//     const response = await axios.post(
+//       'http://localhost:5000/api/books',
+//       bookData,
+//       {
+//         headers: {
+//           'Authorization': `Bearer ${token}`,
+//           'Content-Type': 'application/json',
+//         },
+//       }
+//     );
+//     console.log('Book saved successfully:', response.data);
+//     navigate('/my-bookshelf');
+//   } catch (error) {
+//     console.error('Error saving book:', error);
+//     if (error.response && error.response.status === 401) {
+//       alert('Token is invalid or expired. Please log in again.');
+//     } else {
+//       alert('An error occurred while saving the book.');
+//     }
+//   }
+// };
+
+// const SearchBooks = ({ onAddBook }) => {
+//   const [searchTerm, setSearchTerm] = useState('');
+//   const [books, setBooks] = useState([]);
+//   const [error, setError] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [successMessage, setSuccessMessage] = useState('');
+
+//   const navigate = useNavigate();
+
+//   const fetchBooks = async () => {
+//     if (searchTerm.trim() === '') return;
+
+//     try {
+//       setLoading(true);
+//       setError(null);
+//       const response = await axios.get(
+//         `https://www.googleapis.com/books/v1/volumes?q=${searchTerm}&key=AIzaSyDSQylmKgyAyg4ahgBu4-Rw50atRUONZ4M`
+//       );
+//       setBooks(response.data.items || []);
+//     } catch (err) {
+//       console.error('Error fetching books:', err);
+//       if (err.response?.status === 429) {
+//         setError('You’ve reached the request limit. Please try again later.');
+//       } else {
+//         setError('Unable to fetch books. Please check your connection.');
+//       }
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const handleSearch = () => {
+//     fetchBooks();
+//   };
+
+
+//   const handleAddBook = (book) => {
+//     const bookData = {
+//       title: book.volumeInfo.title,
+//       author: book.volumeInfo.authors?.join(', ') || 'Unknown',
+//       description: book.volumeInfo.description || 'No description available.',
+//       thumbnail: book.volumeInfo.imageLinks?.thumbnail || null,
+//       rating: 0,
+//       review: '',
+//     };
+
+    
+
+//     setSuccessMessage(
+//       `${book.volumeInfo.title} has been added to your bookshelf! Please go to MyBookshelf and check.`
+//     );
+
+//     setTimeout(() => setSuccessMessage(''), 10000);
+//     saveBookToDB(bookData, navigate);
+//   };
+
+//   return (
+//     <div>
+//       <h1 style={{ textAlign: 'center' }}>Welcome to Books World !!!</h1>
+//       <p className="book-message">
+//         Please type any keyword or book name and start exploring books you love!!!
+//       </p>
+//       <input
+//         className="searchbox"
+//         type="text"
+//         value={searchTerm}
+//         onChange={(e) => setSearchTerm(e.target.value)}
+//         placeholder="Search for books"
+//       />
+//       <button className="searchbutton" onClick={handleSearch}>
+//         Search
+//       </button>
+
+//       {successMessage && <p className="success-message">{successMessage}</p>}
+//       {loading && <p>Loading...</p>}
+//       {error && <p style={{ color: 'red' }}>{error}</p>}
+
+//       <div className="books-grid">
+//         {books.map((book, index) => (
+//           <div key={book.id || index} className="book-box">
+//             <h3>{book.volumeInfo.title}</h3>
+//             <p className="author-name">
+//               Author: {book.volumeInfo.authors?.join(', ') || 'Unknown'}
+//             </p>
+//             {book.volumeInfo.imageLinks?.thumbnail && (
+//               <img
+//                 src={book.volumeInfo.imageLinks.thumbnail}
+//                 alt={book.volumeInfo.title}
+//               />
+//             )}
+//             <button
+//               className="addtobookshelf-btn"
+//               onClick={() => handleAddBook(book)}
+//             >
+//               Add to Bookshelf
+//             </button>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default SearchBooks;// Added some
+
+
+import React, { useState } from 'react';
+import axios from 'axios';
+import 'styles/searchbooks.css';
+import { useNavigate } from 'react-router-dom';
+
 const saveBookToDB = async (bookData, navigate) => {
   const token = localStorage.getItem('token');
   if (!token) {
     alert('You must be logged in!');
+    navigate('/login'); // Redirect to login if no token
     return;
   }
+
   try {
     const response = await axios.post(
-      'http://localhost:5000/api/books',
-      bookData,
+      'http://localhost:5000/api/books', // Backend API endpoint
+      bookData, // Send the book data
       {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Include token in header
           'Content-Type': 'application/json',
         },
       }
     );
+
     console.log('Book saved successfully:', response.data);
-    navigate('/my-bookshelf');
+    //alert('Book saved successfully!');
   } catch (error) {
     console.error('Error saving book:', error);
+
     if (error.response && error.response.status === 401) {
-      alert('Token is invalid or expired. Please log in again.');
+      alert('Invalid or expired token. Please log in again.');
+      navigate('/login'); // Redirect to login on 401 error
     } else {
       alert('An error occurred while saving the book.');
     }
   }
 };
 
-const SearchBooks = ({ onAddBook }) => {
+
+const SearchBooks = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [books, setBooks] = useState([]);
   const [error, setError] = useState(null);
@@ -164,12 +310,14 @@ const SearchBooks = ({ onAddBook }) => {
     try {
       setLoading(true);
       setError(null);
+
       const response = await axios.get(
         `https://www.googleapis.com/books/v1/volumes?q=${searchTerm}&key=AIzaSyDSQylmKgyAyg4ahgBu4-Rw50atRUONZ4M`
       );
       setBooks(response.data.items || []);
     } catch (err) {
       console.error('Error fetching books:', err);
+
       if (err.response?.status === 429) {
         setError('You’ve reached the request limit. Please try again later.');
       } else {
@@ -184,7 +332,6 @@ const SearchBooks = ({ onAddBook }) => {
     fetchBooks();
   };
 
-
   const handleAddBook = (book) => {
     const bookData = {
       title: book.volumeInfo.title,
@@ -195,42 +342,45 @@ const SearchBooks = ({ onAddBook }) => {
       review: '',
     };
 
+    saveBookToDB(bookData, navigate);
     
-
     setSuccessMessage(
-      `${book.volumeInfo.title} has been added to your bookshelf! Please go to MyBookshelf and check.`
+      <p className='success-message'><strong>`${book.volumeInfo.title} </strong>has been added to your bookshelf! Please go to MyBookshelf and check.`</p>
     );
 
     setTimeout(() => setSuccessMessage(''), 10000);
-    saveBookToDB(bookData, navigate);
   };
 
   return (
-    <div>
-      <h1 style={{ textAlign: 'center' }}>Welcome to Books World !!!</h1>
-      <p className="book-message">
+    <div className="searchbooks-image">
+      <h1 className="welcome-text" style={{ textAlign: 'center' }}>Welcome to Books World !!!</h1>
+      <p className='book-message'>
         Please type any keyword or book name and start exploring books you love!!!
-      </p>
+      </p>      
       <input
-        className="searchbox"
+        className='searchbox'
         type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         placeholder="Search for books"
       />
-      <button className="searchbutton" onClick={handleSearch}>
+      <button
+        className='searchbutton'
+        onClick={handleSearch}
+      >
         Search
-      </button>
+      </button>     
 
-      {successMessage && <p className="success-message">{successMessage}</p>}
+      {successMessage && <div className='success-message'>{successMessage}</div>}
+
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
       <div className="books-grid">
         {books.map((book, index) => (
-          <div key={book.id || index} className="book-box">
+          <div key={book.id || index} className='book-box'>
             <h3>{book.volumeInfo.title}</h3>
-            <p className="author-name">
+            <p className='author-name'>
               Author: {book.volumeInfo.authors?.join(', ') || 'Unknown'}
             </p>
             {book.volumeInfo.imageLinks?.thumbnail && (
@@ -240,16 +390,16 @@ const SearchBooks = ({ onAddBook }) => {
               />
             )}
             <button
-              className="addtobookshelf-btn"
+              className='addtobookshelf-btn'
               onClick={() => handleAddBook(book)}
             >
               Add to Bookshelf
             </button>
           </div>
         ))}
-      </div>
+      </div>           
     </div>
   );
 };
 
-export default SearchBooks;// Added some
+export default SearchBooks;

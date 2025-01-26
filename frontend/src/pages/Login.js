@@ -200,7 +200,7 @@ const Login = ({ onLoginSuccess }) => {
         const data = JSON.parse(text); // Try parsing the text as JSON
         if (response.ok) {
           localStorage.setItem("token", data.token);
-          localStorage.setIitem("userId", data?.userId)
+          localStorage.setItem("userId", data?.userId)
           onLoginSuccess(); // Trigger onLoginSuccess to update the login state       
           setSuccessMessage("Login successful! Redirecting...");
           
@@ -220,7 +220,7 @@ const Login = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="login-container">
+    <div className="login-container login-backgroundimage">
       <form className="login-form" onSubmit={handleLogin}>
         <h2 className="login-title">Please enter registered details..</h2>
         {errorMessage && <p className="error-message">{errorMessage}</p>}

@@ -1,6 +1,7 @@
 .homepage {
-    background-image: url('../styles/homepagewallpaper.jpg');     
-    height: 90vh;
+    background-image: url('../styles/book4.jpg');     
+    height: 80vh;
+    background-size: cover;
   }
   
 h2 {

@@ -1,8 +1,8 @@
 /* Signup form container */
 .signup-container{
-  display: block;  
-  margin : 4% auto;
-  width: 38%;
+  display: inline-block;  
+  margin : 4% 25%;
+  width: 45%;
 }
 
 /* Styling the login form itself */
@@ -17,7 +17,7 @@
   text-align: center;
   margin-bottom: 1.5rem;
   font-size: 1.4rem;
-  color: #333333;
+  color: white;
 }
 
 /* Input fields */
@@ -87,7 +87,7 @@
 } */
 
 .signuptext{
-  color: black;
+  color: white;
   display: inline-block;
 }
 
@@ -109,4 +109,15 @@
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
   border-radius: 5px;
+}
+
+.login-backgroundimage{
+  background-image: url('../styles/book6.jpg');     
+  height: 80vh;
+  background-size: cover;
+}
+
+.signup-label{
+  color : white;
+  font-size: 1.2rem;
 }

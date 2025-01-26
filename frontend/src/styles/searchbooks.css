@@ -4,6 +4,10 @@
     height: 30px;  
    
 }
+
+.welcome-text{
+    color: white;
+}
 .searchbutton{
     padding: 10px 15px;
     margin-left: 10px;
@@ -125,3 +129,9 @@
     margin-bottom: 20px;
   }
   
+  .searchbooks-image{
+    background-image: url('../styles/book5.jpg');     
+    height: auto;
+    background-size: contain;
+    /* display: inline-block; */
+  }
