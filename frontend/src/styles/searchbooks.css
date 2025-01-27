@@ -131,7 +131,6 @@
   
   .searchbooks-image{
     background-image: url('../styles/book5.jpg');     
-    height: auto;
-    background-size: contain;
-    /* display: inline-block; */
+    height: 100rem;
+    background-size: 100% 100%;
   }

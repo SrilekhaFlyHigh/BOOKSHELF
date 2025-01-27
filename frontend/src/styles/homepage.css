@@ -1,5 +1,5 @@
 .homepage {
-    background-image: url('../styles/book4.jpg');     
+    background-image: url('../styles/book1.jpg');     
     height: 80vh;
     background-size: cover;
   }
@@ -11,7 +11,12 @@ h2 {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }   
 
-p {
-    color: white;
-    
+/* p {
+    color: white;    
+} */
+
+.start-text{
+    color: green;
+    background-color: bisque;
+    padding: 3px 0;
 }

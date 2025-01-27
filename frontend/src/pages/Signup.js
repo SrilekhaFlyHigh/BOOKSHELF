@@ -23,7 +23,8 @@ const Signup = () => {
   
     try {
       // Send signup request to the backend
-      const response = await fetch("http://localhost:5000/api/auth/signup", {
+      //const response = await fetch("http://localhost:5000/api/auth/signup", {
+        const response = await fetch("https://bookshelf-lp8f.onrender.com/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

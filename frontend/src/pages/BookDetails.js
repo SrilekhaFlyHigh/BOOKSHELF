@@ -49,7 +49,8 @@ function BookDetails() {
   useEffect(() => {
     const fetchBookDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/book/${id}`);
+        // const response = await fetch(`http://localhost:5000/book/${id}`);
+        const response = await fetch(`https://bookshelf-lp8f.onrender.com/api/books/${id}`);
         if (!response.ok) {
           throw new Error(`Error: ${response.status} ${response.statusText}`);
         }
@@ -78,7 +79,8 @@ function BookDetails() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/book/${id}`, {
+      //const response = await fetch(`http://localhost:5000/book/${id}`, {
+        const response = await fetch(`https://bookshelf-lp8f.onrender.com/api/books/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

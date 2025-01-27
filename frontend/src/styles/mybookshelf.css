@@ -197,7 +197,7 @@ h1 {
   font-weight: bold;
   background-color: antiquewhite;
   color: #218838;
-  height: 40px;
+  height: 50px;
   display: block;
   padding-top: 10px;
 }
@@ -337,7 +337,7 @@ ul {
 
 .mybookshelf-image{
   background-image: url('../styles/book2.jpg');     
-  height: auto;
+  height: 100rem;
   background-size: contain;
 }
 

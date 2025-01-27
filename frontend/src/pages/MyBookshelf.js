@@ -490,7 +490,8 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
     try {
       const userId = localStorage.getItem("userId") || ""
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/books/user/${userId}`, {
+      //const response = await fetch(`http://localhost:5000/api/books/user/${userId}`, {
+        const response = await fetch(`https://bookshelf-lp8f.onrender.com/api/books/user/${userId}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`, // Include token in header
@@ -547,7 +548,8 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
   // Save review to the database
   const saveReviewToDB = async (bookId, review) => {
     try {
-      const response = await fetch(`http://localhost:5000/books/${bookId}/review`, {
+      //const response = await fetch(`http://localhost:5000/books/${bookId}/review`, {
+        const response = await fetch(`https://bookshelf-lp8f.onrender.com/api/books/${bookId}/review`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -571,7 +573,8 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
   const saveRatingToDB = async (bookId, rating) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/books/${bookId}/rating`, {
+      //const response = await fetch(`http://localhost:5000/api/books/${bookId}/rating`, {
+        const response = await fetch(`https://bookshelf-lp8f.onrender.com/api/books/${bookId}/rating`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`, // Include token in header
@@ -593,7 +596,8 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
   const removeReviewFromDB = async (bookId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/books/${bookId}/review`, {
+      //const response = await fetch(`http://localhost:5000/books/${bookId}/review`, {
+        const response = await fetch(`https://bookshelf-lp8f.onrender.com/api/books/${bookId}/review`, {
         headers: {
           Authorization: `Bearer ${token}`, // Include token in header
           'Content-Type': 'application/json',
@@ -622,7 +626,8 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
         return;
       }
   
-      const response = await fetch(`http://localhost:5000/api/books`, {
+      //const response = await fetch(`http://localhost:5000/api/books`, {
+        const response = await fetch(`https://bookshelf-lp8f.onrender.com/api/books`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
