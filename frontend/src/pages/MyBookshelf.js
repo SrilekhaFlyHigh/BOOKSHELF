@@ -77,24 +77,26 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
   const saveReviewToDB = async (bookId, review) => {
     try {
       //const response = await fetch(`http://localhost:5000/books/${bookId}/review`, {
-        const response = await fetch(`https://bookshelf-lp8f.onrender.com/api/books/${bookId}/review`, {
+        const response = await fetch(`https://bookshelf-lp8f.onrender.com/api/books/review/${bookId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ review }),
+        body: JSON.stringify({ review }),        
       });
+      console.log("Review response", response);
+      console.log("review", review);
   
       if (!response.ok) {
         throw new Error('Failed to save review');
-      }
-  
+      }  
       const data = await response.json();
       console.log(data);
     } catch (error) {
       console.error('Error saving review:', error);
     }
   };
+  
   
 
   // Save rating to the database
@@ -212,7 +214,7 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
       return updatedReviews;
     });
     if (bookId) removeReviewFromDB(bookId); // Remove from DB
-  };
+  };//removing review is working fine from frontend
 
   const handleEditToggle = (index) => {
     setIsEditing((prev) => ({
@@ -240,8 +242,9 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
   return (
     <div className="my-bookshelf mybookshelf-image">
       <h1 className='mycollections-text'>
-        <center>My Collections</center>
+        <center>My Collections</center>        
       </h1>
+      <p className='feel-free'>Please click on <b>"Add Reviews"</b> button to enter you reviews & ratings and click on <b>"Save Changes"</b></p>
       {showRemoveMessage && (
         <p className="success-message">
           The Book "<strong>{removedBookName}</strong>" has been removed successfully from your bookshelf!
@@ -250,7 +253,7 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
       {myBooks.length === 0 ? (
         <p className="book-message">
           Ah !!! Currently your bookshelf is empty. Start exploring books using the search feature and create your
-          personalized favourites.
+          personalized favourites.          
         </p>
       ) : (
         <ul>
@@ -299,7 +302,7 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
                   </button>
                   ) : (
                   <button className="edit-button" onClick={() => handleEditToggle(index)}>
-                      Add / Edit Review
+                      Add Review
                   </button>
                   )}
             </li>

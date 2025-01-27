@@ -218,7 +218,7 @@ app.delete('/api/books', async (req, res) => {
 
 
 // Save book rating
-app.put("/api/books/:bookId/rating", authenticateToken, async (req, res) => {
+app.post("/api/books/:bookId/rating", authenticateToken, async (req, res) => {
   const { bookId } = req.params;
   const { rating, review } = req.body;
 
@@ -240,18 +240,17 @@ app.put("/api/books/:bookId/rating", authenticateToken, async (req, res) => {
 // Save book review
 app.post('api/books/:bookId/review', async (req, res) => {
   const bookId = req.params.bookId;
+  console.log("BookId", bookId);
   const { reviewText, reviewerName, rating } = req.body;
-
   try {
     // Find the book by ID
     const book = await Book.findById(bookId);
-
+    console.log("Book", book);
     if (!book) {
       return res.status(404).json({ message: 'Book not found' });
     }
-
     // Add the review to the book's reviews array
-    book.reviews.push({ reviewText, reviewerName, rating });
+    book.review.push({ reviewText, reviewerName, rating });
 
     // Save the updated book document
     await book.save();

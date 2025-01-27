@@ -346,3 +346,11 @@ ul {
   background-color: antiquewhite;
   font-weight: bold;
 }
+
+.feel-free{
+  background-color: azure;
+  color: blueviolet;
+  font-size: 18px;
+  height: 31px;
+  padding: 3px 10px;
+}
