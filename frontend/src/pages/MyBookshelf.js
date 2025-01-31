@@ -9,7 +9,7 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
   const [reviews, setReviews] = useState({}); // Track reviews for books
   const [ratings, setRatings] = useState({}); // Track ratings for books 
   const [myBooks, setMyBooks] = useState([]);
-  // const [successMessage, setSuccessMessage] = useState('');  // State for success message
+  const [successMessage, setSuccessMessage] = useState("");  // State for success message
   const [isEditing, setIsEditing] = useState({}); // Track which book is being edited
 
   
@@ -74,11 +74,12 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
   
 
   // Save review to the database
-  const saveReviewToDB = async (bookId, review) => {
+  const saveReviewToDB = async (bookId, review, index) => {
     try {
-      //const response = await fetch(`http://localhost:5000/books/${bookId}/review`, {
+      console.log("Sending Review:", { bookId, review });
+      //const response = await fetch(`http://localhost:5000/api/books/review/${bookId}`, {
         const response = await fetch(`https://bookshelf-lp8f.onrender.com/api/books/review/${bookId}`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -91,7 +92,20 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
         throw new Error('Failed to save review');
       }  
       const data = await response.json();
-      console.log(data);
+      console.log("Saved data", data);
+      // ✅ Update success message for only this book
+      setSuccessMessage((prev) => ({
+      ...prev,
+      [index]: "Review saved successfully!",
+    }));
+
+    // Hide message after 3 seconds
+    setTimeout(() => {
+      setSuccessMessage((prev) => ({
+        ...prev,
+        [index]: "", // Clear message
+      }));
+    }, 3000);
     } catch (error) {
       console.error('Error saving review:', error);
     }
@@ -100,27 +114,27 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
   
 
   // Save rating to the database
-  const saveRatingToDB = async (bookId, rating) => {
-    try {
-      const token = localStorage.getItem("token");
-      //const response = await fetch(`http://localhost:5000/api/books/${bookId}/rating`, {
-        const response = await fetch(`https://bookshelf-lp8f.onrender.com/api/books/${bookId}/rating`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`, // Include token in header
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ rating }),
-      });
+  // const saveRatingToDB = async (bookId, rating) => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     //const response = await fetch(`http://localhost:5000/api/books/${bookId}/rating`, {
+  //       const response = await fetch(`https://bookshelf-lp8f.onrender.com/api/books/${bookId}/rating`, {
+  //       method: 'PUT',
+  //       headers: {
+  //         Authorization: `Bearer ${token}`, // Include token in header
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ rating }),
+  //     });
 
-      if (!response.ok) {
-        throw new Error('Failed to save rating');
-      }
-      console.log('Rating saved successfully!');
-    } catch (error) {
-      console.error('Error saving rating:', error);
-    }
-  };
+  //     if (!response.ok) {
+  //       throw new Error('Failed to save rating');
+  //     }
+  //     console.log('Rating saved successfully!');
+  //   } catch (error) {
+  //     console.error('Error saving rating:', error);
+  //   }
+  // };
 
   // Remove review from the database
   const removeReviewFromDB = async (bookId) => {
@@ -193,17 +207,24 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
       ...prev,
       [index]: rating,
     }));
-    if (bookId) saveRatingToDB(bookId, rating); // Save to DB
+    //if (bookId) saveRatingToDB(bookId, rating); // Save to DB
   };
 
-  const handleReviewChange = (index, reviewText) => {
+  const handleReviewChange = (index, review) => {
     const bookId = myBooks[index]?._id; // Assuming each book has a unique `_id`
-    console.log('Book ID:', bookId);
+    console.log("Book ID:", bookId, "Review:", review);
+
     setReviews((prev) => ({
       ...prev,
-      [index]: reviewText,
+      [index]: review,
     }));
-    if (bookId) saveReviewToDB(bookId, reviewText); // Save to DB
+    //if (bookId) saveReviewToDB(bookId, review, index); // Save to DB
+
+     // Toggle edit mode when review is being written
+    setIsEditing((prev) => ({
+    ...prev,
+    [index]: true, // Change button text to Save Changes
+    }));
   };
 
   const handleRemoveReview = (index) => {
@@ -223,20 +244,52 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
     }));
   };
 
-  const handleSaveChanges = (index) => {
-    const bookId = books[index]?._id; // Assuming each book has a unique `_id`
-    const updatedReview = reviews[index];
-    const updatedRating = ratings[index];
+  const handleSaveChanges = async (index) => {
+    const bookId = myBooks[index]?._id;
+    const review = reviews[index];
+  
+    if (!bookId || !review.trim()) return; // Prevent empty review submission
+  
+    try {
+      console.log("Saving Review:", { bookId, review });
+      //console.log("Sending request to:", `https://bookshelf-lp8f.onrender.com/api/books/review/${bookId}`);
+            //const response = await fetch(`http://localhost:5000/api/books/review/${bookId}`, {
+            const response = await fetch(`https://bookshelf-lp8f.onrender.com/api/books/review/${bookId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ review }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to save review');
+      }
+  
+      const data = await response.json();
+      console.log("Review saved:", data);
+  
+      // ✅ Show success message only for this book
+      setSuccessMessage((prev) => ({
+        ...prev,
+        [index]: "Review saved successfully!",
+      }));
+  
+      // ✅ Hide message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage((prev) => ({
+          ...prev,
+          [index]: "", // Clear message
+        }));
+      }, 3000);
 
-    if (bookId) {
-      saveReviewToDB(bookId, updatedReview);
-      saveRatingToDB(bookId, updatedRating);
+      setIsEditing((prev) => ({
+        ...prev,
+        [index]: false, // Set to false to show "Add Review" button again
+      }));
+    } catch (error) {
+      console.error("Error saving review:", error);
     }
-
-    setIsEditing((prev) => ({
-      ...prev,
-      [index]: false, // Disable edit mode after saving
-    }));
   };
 
   return (
@@ -244,7 +297,7 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
       <h1 className='mycollections-text'>
         <center>My Collections</center>        
       </h1>
-      <p className='feel-free'>Please click on <b>"Add Reviews"</b> button to enter you reviews & ratings and click on <b>"Save Changes"</b></p>
+      <p className='feel-free'>Please click on <b>"Add Reviews"</b> button to enter your reviews & ratings and click on <b>"Save Changes"</b></p>
       {showRemoveMessage && (
         <p className="success-message">
           The Book "<strong>{removedBookName}</strong>" has been removed successfully from your bookshelf!
@@ -258,7 +311,7 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
       ) : (
         <ul>
           {myBooks.map((book, index) => (
-            <li className="book-box" key={index}>
+            <li className="book-box" key={book._id || index}>
               <div>
                 <img src={book.thumbnail} alt={book.title} />
                 <h3>{book.title}</h3>
@@ -285,8 +338,9 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
                     className="book-review"
                     value={reviews[index] || ''}
                     onChange={(e) => handleReviewChange(index, e.target.value)}
-                  />
+                  />                  
                 </label>
+                {successMessage[index] && <p className="success-message">{successMessage[index]}</p>}
                 {reviews[index] && (
                   <button className="remove-review-button" onClick={() => handleRemoveReview(index)}>
                     Remove Review
@@ -294,7 +348,7 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
                 )}
               </div>
               <button className="remove-button" onClick={() => handleRemoveBook(index)}>
-                Remove
+                Remove Book
               </button>
               {isEditing[index] ? (
                   <button className="save-button" onClick={() => handleSaveChanges(index)}>
@@ -304,7 +358,7 @@ const MyBookshelf = ({ books, onRemoveBook }) => {
                   <button className="edit-button" onClick={() => handleEditToggle(index)}>
                       Add Review
                   </button>
-                  )}
+                  )}  
             </li>
           ))}
         </ul>

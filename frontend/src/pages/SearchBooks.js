@@ -90,7 +90,7 @@ const SearchBooks = () => {
     saveBookToDB(bookData, navigate);
     
     setSuccessMessage(
-      <p className='success-message'><strong>`{book.volumeInfo.title}</strong>has been added to your bookshelf! Please go to MyBookshelf and check.`</p>
+      <p className='success-message'><strong>{book.volumeInfo.title}</strong> has been added to your bookshelf! Please go to MyBookshelf and check.</p>
     );
 
     setTimeout(() => setSuccessMessage(''), 10000);

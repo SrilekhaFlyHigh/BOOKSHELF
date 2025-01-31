@@ -109,10 +109,10 @@ const Signup = () => {
           />
         </div>
         <button className="signupbtn" type="submit">Signup</button>
-      </form>
-
+      </form>      
       {/* Displaying success or error message */}
       {message && <p className="message">{message}</p>}
+      {/* <h3><p className="login-during">Please be patient during registering process... </p></h3> */}
     </div>
     </div>
   );

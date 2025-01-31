@@ -238,19 +238,31 @@ app.post("/api/books/:bookId/rating", authenticateToken, async (req, res) => {
 });
 
 // Save book review
-app.post('api/books/:bookId/review', async (req, res) => {
-  const bookId = req.params.bookId;
-  console.log("BookId", bookId);
-  const { reviewText, reviewerName, rating } = req.body;
+app.put("/api/books/review/:bookId", async (req, res) => {
+  const { bookId } = req.params;
+  const { review } = req.body;
+  
+  if (!bookId || !review) {
+    return res.status(400).json({ message: "Book ID and review are required" });
+  }
+
   try {
+     // Convert bookId to ObjectId
+     if (!mongoose.Types.ObjectId.isValid(bookId)) {
+      return res.status(400).json({ message: 'Invalid book ID format' });
+    }
     // Find the book by ID
+    console.log("BookId received:", bookId);
+    console.log("Request Body:", req.body);
     const book = await Book.findById(bookId);
     console.log("Book", book);
     if (!book) {
       return res.status(404).json({ message: 'Book not found' });
     }
-    // Add the review to the book's reviews array
-    book.review.push({ reviewText, reviewerName, rating });
+    
+    // Update the `review` field  
+    book.review = review;
+
 
     // Save the updated book document
     await book.save();
@@ -264,26 +276,26 @@ app.post('api/books/:bookId/review', async (req, res) => {
 
 // Save book rating
 // PUT endpoint for updating book rating
-app.put('/api/books/:bookId', authenticateToken, async (req, res) => {
-  try {
-    const { rating } = req.body; // Extract the new rating from the request body
-    const bookId = req.params.id;
+// app.put('/api/books/:bookId', authenticateToken, async (req, res) => {
+//   try {
+//     const { rating } = req.body; // Extract the new rating from the request body
+//     const bookId = req.params.id;
 
-    const updatedBook = await Book.findByIdAndUpdate(
-      bookId,
-      { rating: rating }, // Update the rating field
-      { new: true } // Return the updated book
-    );
+//     const updatedBook = await Book.findByIdAndUpdate(
+//       bookId,
+//       { rating: rating }, // Update the rating field
+//       { new: true } // Return the updated book
+//     );
 
-    if (!updatedBook) {
-      return res.status(404).json({ message: "Book not found" });
-    }
+//     if (!updatedBook) {
+//       return res.status(404).json({ message: "Book not found" });
+//     }
 
-    res.json({ book: updatedBook });
-  } catch (error) {
-    res.status(500).json({ message: "Error updating rating", error });
-  }
-});
+//     res.json({ book: updatedBook });
+//   } catch (error) {
+//     res.status(500).json({ message: "Error updating rating", error }); 
+//   }
+// });
 
 // Delete book review
 app.delete('/api/books/:id/review', authenticateToken, async (req, res) => {

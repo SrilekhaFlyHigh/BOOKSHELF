@@ -99,3 +99,11 @@
   height: 80vh;
   background-size: cover;
 }
+
+.login-during{
+  background-color: brown;
+    height: 30px;
+    padding: 5px 0;
+    text-align: center;
+    color: white;
+}

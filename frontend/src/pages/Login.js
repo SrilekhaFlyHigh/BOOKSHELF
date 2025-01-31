@@ -84,6 +84,7 @@ const Login = ({ onLoginSuccess }) => {
         <p className="link">
            Don't have an account? <a href="/signup">Sign Up</a>
          </p>
+         <h3><p className="login-during">Please be patient during login process... </p></h3>
       </form>
     </div>
   );
